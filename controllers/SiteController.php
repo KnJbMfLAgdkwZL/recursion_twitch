@@ -22,9 +22,12 @@ class SiteController extends Controller
                 $api_data[] = $this->get_api($v['name']);
             }
 
+            echo '<pre>';
+            print_r($api_data);
+
             foreach ($api_data as $v) {
                 if ($v['status'] == 'Offline') {
-                    $chanels->updateStatus($data['name'], $data['status']);
+                    $chanels->updateStatus($v['name'], $v['status']);
                 } else if ($v['status'] == 'Live') {
                     $chanels->update($v['name'], $v['currentGame'], $v['logo'], $v['streamTitle'], $v['status']);
                 }

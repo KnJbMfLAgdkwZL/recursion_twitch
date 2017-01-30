@@ -10,12 +10,12 @@
     <tr>
         <td>
             <h2 id='stream-title'>
-                РАНКЕД.
+                <?= $data[0]['streamTitle'] ?>
             </h2>
             <h3 id='stream-h3'>
-                <strong id='stream-author'>LeaveNeed</strong>
+                <strong id='stream-author'><?= $data[0]['name'] ?></strong>
                 стримит
-                <strong id='stream-game'>Gwent: The Witcher Card Game</strong>
+                <strong id='stream-game'><?= $data[0]['currentGame'] ?></strong>
             </h3>
         </td>
         <td>
@@ -36,49 +36,73 @@
         <td id='stream-main-td'>
             <iframe
                 id='stream-main-td-iframe-video'
-                src='https://player.twitch.tv/?channel=dxdydzdt'
+                src='https://player.twitch.tv/?channel=<?= $data[0]['name'] ?>&autoplay=1'
                 frameborder='0'
                 allowfullscreen='true'
                 scrolling='no'
                 height='100%'
-                width='100%'>
+                width='100%'
+                autoplay='1'
+            >
             </iframe>
         </td>
         <td colspan='2' id='td-stream-list'>
-
             <h3 id='td-stream-list-title'>Текушие</h3>
-
-            <ul id='td-stream-list-ul'>
+            <ul class='td-stream-list-ul'>
                 <?php
-                foreach ($data as $v) {
-                    echo "<li id='td-stream-list-li'>", $v['name'], "</li>";
+                foreach ($data as $k => $v) {
+                    $logo = $v['logo'];
+
+                    $title = $v['streamTitle'];
+                    if (empty($title))
+                        $title = $v['name'];
+
+                    $currentGame = $v['currentGame'];
+
+                    $status_class = '';
+                    $status = $v['status'];
+                    if ($status == 'Offline')
+                        $status_class = ' li-status-ofline';
+
+                    $list_class = '';
+                    if ($k == 0)
+                        $list_class = ' td-stream-list-li-current';
+
+                    $name = $v['name'];
+
+                    echo "
+                        <li class='td-stream-list-li{$list_class}' onclick='list_click(\"{$name}\", this)'>
+                            <span class='td-stream-list-li-avatar'>
+                                <img class='td-stream-list-li-avatar-img' src='{$logo}'/>
+                            </span>
+                            <span class='td-stream-list-li-title'>
+                                {$title}
+                            </span>
+                            <span class='td-stream-list-li-game'>
+                                {$currentGame}
+                            </span>
+                            <span class='td-stream-list-li-status{$status_class}'>{$status}</span>
+                        </li>";
                 }
                 ?>
             </ul>
         </td>
         <td colspan='2' style='display: none' id='td-stream-chat'>
+
             <iframe
                 id='stream-main-td-iframe-chat'
-                src='https://www.twitch.tv/dxdydzdt/chat?popout='
+                src='https://www.twitch.tv/<?= $data[0]['name'] ?>/chat?popout='
                 frameborder='0'
                 scrolling='no'
                 height='100%'
                 width='100%'
             ></iframe>
+
         </td>
+
     </tr>
 </table>
 <style>
-    /* cyrillic-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 100;
-        src: local('Roboto Thin'), local('Roboto-Thin'), url(http://fonts.gstatic.com/s/roboto/v15/ty9dfvLAziwdqQ2dHoyjphTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
-        unicode-range: U+0460-052F, U+20B4, U+2DE0-2DFF, U+A640-A69F;
-    }
-
-    /* cyrillic */
     @font-face {
         font-family: 'Roboto';
         font-style: normal;
@@ -87,202 +111,137 @@
         unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
     }
 
-    /* cyrillic-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
+    #stream-main-td {
+        height: 600px;
+        width: 64.123456%;
+    }
+
+    #td-stream-list {
+        width: 35.21234%;
+    }
+
+    #td-stream-chat {
+        width: 35.21234%;
+    }
+
+    .td-stream-list-ul {
+        list-style-type: none;
+        display: initial;
+        text-align: left;
+
+        border: 0;
+        outline: 0;
+        vertical-align: baseline;
+        background: transparent;
+        font-size: 100%;
+        quotes: none;
+    }
+
+    .td-stream-list-li:hover {
+        background-color: #191919;
+    }
+
+    .td-stream-list-li {
+        text-align: left;
+        cursor: pointer;
+        height: 40px;
+        margin: 2px 0;
+        min-width: 0;
+        display: flex;
+        box-align: center;
+        align-items: center;
+        box-pack: justify;
+        justify-content: space-between;
+        flex: 1;
+        padding-left: 5px;
+        background-color: #000;
+        color: #a6a6a6;
+    }
+
+    .td-stream-list-li-avatar {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        vertical-align: middle;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .td-stream-list-li-avatar-img {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        vertical-align: middle;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .td-stream-list-li-title {
+        color: #a6a6a6;
+        font: 14px 'Roboto', arial, sans-serif;
+        font-weight: bold;
+        display: inline-block;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        margin-right: -5px;
+    }
+
+    .td-stream-list-li-game {
+        display: inline-block;
+        width: 100%;
+        padding: 0 10px;
+        max-width: 100px;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .td-stream-list-li-status {
+        background-color: #3cb878;
+        display: flex;
+        align-items: center;
+        width: 80px;
+        padding: 0 7px;
+        font-size: 13px;
         font-weight: 300;
-        src: local('Roboto Light'), local('Roboto-Light'), url(http://fonts.gstatic.com/s/roboto/v15/0eC6fl06luXEYWpBSJvXCBJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0460-052F, U+20B4, U+2DE0-2DFF, U+A640-A69F;
+        line-height: 1.1;
+        color: #fff;
+        height: 40px;
     }
 
-    /* cyrillic */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 300;
-        src: local('Roboto Light'), local('Roboto-Light'), url(http://fonts.gstatic.com/s/roboto/v15/Fl4y0QdOxyyTHEGMXX8kcRJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    .li-status-ofline {
+        background-color: #333;
     }
 
-    /* cyrillic-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 400;
-        src: local('Roboto'), local('Roboto-Regular'), url(http://fonts.gstatic.com/s/roboto/v15/ek4gzZ-GeXAPcSbHtCeQI_esZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
-        unicode-range: U+0460-052F, U+20B4, U+2DE0-2DFF, U+A640-A69F;
+    .td-stream-list-li-status::before {
+        /*background-position: -34px 4px;
+        content: '';
+        display: inline-block;
+        width: 32px;
+        height: 40px;
+        background-repeat: no-repeat;
+        background-image: url('/www/img/playstop.png')*/
     }
 
-    /* cyrillic */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 400;
-        src: local('Roboto'), local('Roboto-Regular'), url(http://fonts.gstatic.com/s/roboto/v15/mErvLBYg_cXG3rLvUsKT_fesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
-        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    .td-stream-list-li-current:hover {
+        background-color: #FFFFFF;
+        color: #000000;
     }
 
-    /* cyrillic-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 500;
-        src: local('Roboto Medium'), local('Roboto-Medium'), url(http://fonts.gstatic.com/s/roboto/v15/ZLqKeelYbATG60EpZBSDyxJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0460-052F, U+20B4, U+2DE0-2DFF, U+A640-A69F;
+    .td-stream-list-li-current {
+        background-color: #FFFFFF;
+        color: #000000;
     }
 
-    /* cyrillic */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 500;
-        src: local('Roboto Medium'), local('Roboto-Medium'), url(http://fonts.gstatic.com/s/roboto/v15/oHi30kwQWvpCWqAhzHcCSBJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-    }
-
-    /* cyrillic-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 700;
-        src: local('Roboto Bold'), local('Roboto-Bold'), url(http://fonts.gstatic.com/s/roboto/v15/77FXFjRbGzN4aCrSFhlh3hJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0460-052F, U+20B4, U+2DE0-2DFF, U+A640-A69F;
-    }
-
-    /* cyrillic */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 700;
-        src: local('Roboto Bold'), local('Roboto-Bold'), url(http://fonts.gstatic.com/s/roboto/v15/isZ-wbCXNKAbnjo6_TwHThJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-    }
-
-    /* cyrillic-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 900;
-        src: local('Roboto Black'), local('Roboto-Black'), url(http://fonts.gstatic.com/s/roboto/v15/s7gftie1JANC-QmDJvMWZhJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0460-052F, U+20B4, U+2DE0-2DFF, U+A640-A69F;
-    }
-
-    /* cyrillic */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 900;
-        src: local('Roboto Black'), local('Roboto-Black'), url(http://fonts.gstatic.com/s/roboto/v15/3Y_xCyt7TNunMGg0Et2pnhJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-    }
-
-    /* latin-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 100;
-        src: local('Roboto Thin'), local('Roboto-Thin'), url(http://fonts.gstatic.com/s/roboto/v15/e7MeVAyvogMqFwwl61PKhBTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
-        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-    }
-
-    /* latin */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 100;
-        src: local('Roboto Thin'), local('Roboto-Thin'), url(http://fonts.gstatic.com/s/roboto/v15/2tsd397wLxj96qwHyNIkxPesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
-        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-    }
-
-    /* latin-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 300;
-        src: local('Roboto Light'), local('Roboto-Light'), url(http://fonts.gstatic.com/s/roboto/v15/Pru33qjShpZSmG3z6VYwnRJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-    }
-
-    /* latin */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 300;
-        src: local('Roboto Light'), local('Roboto-Light'), url(http://fonts.gstatic.com/s/roboto/v15/Hgo13k-tfSpn0qi1SFdUfVtXRa8TVwTICgirnJhmVJw.woff2) format('woff2');
-        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-    }
-
-    /* latin-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 400;
-        src: local('Roboto'), local('Roboto-Regular'), url(http://fonts.gstatic.com/s/roboto/v15/Fcx7Wwv8OzT71A3E1XOAjvesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
-        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-    }
-
-    /* latin */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 400;
-        src: local('Roboto'), local('Roboto-Regular'), url(http://fonts.gstatic.com/s/roboto/v15/CWB0XYA8bzo0kSThX0UTuA.woff2) format('woff2');
-        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-    }
-
-    /* latin-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 500;
-        src: local('Roboto Medium'), local('Roboto-Medium'), url(http://fonts.gstatic.com/s/roboto/v15/oOeFwZNlrTefzLYmlVV1UBJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-    }
-
-    /* latin */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 500;
-        src: local('Roboto Medium'), local('Roboto-Medium'), url(http://fonts.gstatic.com/s/roboto/v15/RxZJdnzeo3R5zSexge8UUVtXRa8TVwTICgirnJhmVJw.woff2) format('woff2');
-        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-    }
-
-    /* latin-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 700;
-        src: local('Roboto Bold'), local('Roboto-Bold'), url(http://fonts.gstatic.com/s/roboto/v15/97uahxiqZRoncBaCEI3aWxJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-    }
-
-    /* latin */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 700;
-        src: local('Roboto Bold'), local('Roboto-Bold'), url(http://fonts.gstatic.com/s/roboto/v15/d-6IYplOFocCacKzxwXSOFtXRa8TVwTICgirnJhmVJw.woff2) format('woff2');
-        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-    }
-
-    /* latin-ext */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 900;
-        src: local('Roboto Black'), local('Roboto-Black'), url(http://fonts.gstatic.com/s/roboto/v15/9_7S_tWeGDh5Pq3u05RVkhJtnKITppOI_IvcXXDNrsc.woff2) format('woff2');
-        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-    }
-
-    /* latin */
-    @font-face {
-        font-family: 'Roboto';
-        font-style: normal;
-        font-weight: 900;
-        src: local('Roboto Black'), local('Roboto-Black'), url(http://fonts.gstatic.com/s/roboto/v15/mnpfi9pxYH-Go5UiibESIltXRa8TVwTICgirnJhmVJw.woff2) format('woff2');
-        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+    .td-stream-list-li-current > .td-stream-list-li-title,
+    .td-stream-list-li-current > .td-stream-list-li-game {
+        background-color: #FFFFFF;
+        color: #000000;
     }
 
     table, tr, th, td,
@@ -300,10 +259,6 @@
 
     th, td {
         text-align: center;
-    }
-    #td-stream-list-ul
-    {
-        list-style-type: none;
     }
 
     #stream-title {
@@ -329,7 +284,6 @@
     #td-stream-list-title {
         text-align: left;
         font-size: 12px;
-        font-weight: 300;
         line-height: 1;
         text-transform: uppercase;
         color: #767676;
@@ -337,12 +291,7 @@
 
     #stream-h3 > strong {
         font-weight: 300;
-        color: #fff;
-    }
-
-    #stream-main-td {
-        height: 600px;
-        width: 66.123456%;
+        color: #FFFFFF;
     }
 
     .btn {
@@ -352,6 +301,7 @@
         flex: 0 0 auto;
         padding: 10px 20px;
         font-size: 14px;
+        font-weight: bold;
     }
 
     .btn:hover {
@@ -359,17 +309,17 @@
     }
 
     .btn-color-blue {
-        color: #F1FAFB;
+        color: #FFFFFF;
         background-color: #00a4d1;
     }
 
     .btn-color-gray {
-        color: #F1FAFB;
+        color: #FFFFFF;
         background-color: #323232;
     }
 
     .btn-color-red {
-        color: #F1FAFB;
+        color: #FFFFFF;
         background-color: #BB4848;
     }
 
@@ -444,7 +394,22 @@
                 td_stream_list.style.display = 'none';
             }
         }
-
-
     });
+    function list_click(str, elem) {
+        var stream_video = document.getElementById('stream-main-td-iframe-video');
+        var stream_chat = document.getElementById('stream-main-td-iframe-chat');
+
+        stream_video.src = 'https://player.twitch.tv/?channel=' + str + '&autoplay = 1';
+        stream_chat.src = 'https://www.twitch.tv/' + str + '/chat?popout=';
+
+        var all_li = document.getElementsByClassName('td-stream-list-li');
+        for (var k in all_li) {
+            all_li[k].className = 'td-stream-list-li';
+        }
+        elem.className = 'td-stream-list-li td-stream-list-li-current';
+
+        document.getElementById('stream-title').innerHTML = elem.getElementsByClassName('td-stream-list-li-title')[0].innerHTML;
+        document.getElementById('stream-author').innerHTML = str;
+        document.getElementById('stream-game').innerHTML = elem.getElementsByClassName('td-stream-list-li-game')[0].innerHTML;
+    }
 </script>

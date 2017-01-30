@@ -4,7 +4,7 @@ class Chanels extends ActiveRecord
 {
     function selectAll()
     {
-        $sql = 'SELECT * FROM `chanels`';
+        $sql = 'SELECT * FROM `chanels` ORDER BY `status`';
         $result = $this->Execute($sql);
         return $result;
     }
@@ -25,6 +25,6 @@ class Chanels extends ActiveRecord
     function updateStatus($name, $status)
     {
         $sql = 'UPDATE `chanels` SET `status` = :status WHERE `name` = :name';
-        $result = $this->Execute($sql, ['name' => $name, 'status' => $status]);
+        $result = $this->Execute($sql, ['status' => $status, 'name' => $name]);
     }
 }
