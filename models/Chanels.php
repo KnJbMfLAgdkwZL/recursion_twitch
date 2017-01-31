@@ -27,4 +27,11 @@ class Chanels extends ActiveRecord
         $sql = 'UPDATE `chanels` SET `status` = :status WHERE `name` = :name';
         $result = $this->Execute($sql, ['status' => $status, 'name' => $name]);
     }
+
+    function insert($name)
+    {
+        $sql = "INSERT INTO `chanels`(`id`, `name`, `currentGame`, `logo`, `streamTitle`, `status`)
+                VALUES (NULL, :name, '', '', '', '')";
+        $result = $this->Execute($sql, ['name' => $name]);
+    }
 }

@@ -1,10 +1,21 @@
-<table style='width:100%' border='1' id='stream-twitch-container'>
+<table style='width:100%' border='0' id='stream-twitch-container'>
     <tr id='add_stream-tr' style='display: none;'>
         <td colspan='3' id='add_stream-td'>
-            <input type='text' name='streamname' id='stream-name' required/>
-            <div class='btn btn-color-blue' id='btn-ok'>Ok</div>
-            <div class='btn btn-color-red' id='btn-cansel'>Cansel</div>
-            <div id='goole-captcha-div'>Гугл капча</div>
+
+            <form method="post" action="/index.php?r=site/addstream" id="add_stream-td_form">
+                <input type="hidden" name="r" id='r' value="/index.php?r=site/addstream"/>
+
+                <input type='text' name='streamname' id='stream-name' required/>
+
+                <div class='btn btn-color-blue' id='btn-ok'>Ok</div>
+                <div class='btn btn-color-red' id='btn-cansel'>Cansel</div>
+
+                <script src='https://www.google.com/recaptcha/api.js'></script>
+                <div class="captcha-wraper">
+                    <div class="g-recaptcha" data-sitekey="6LdFtAwTAAAAAJZrogwhu0OCKMobv18hwzbnYsPc"></div>
+                </div>
+            </form>
+
         </td>
     </tr>
     <tr>
@@ -52,6 +63,8 @@
                 <?php
                 foreach ($data as $k => $v) {
                     $logo = $v['logo'];
+                    if (empty($logo))
+                        $logo = 'https://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_70x70.png';
 
                     $title = $v['streamTitle'];
                     if (empty($title))
@@ -111,6 +124,15 @@
         unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
     }
 
+    .captcha-wraper {
+        text-align: center;
+        padding-top: 10px;
+    }
+
+    .g-recaptcha {
+        display: inline-block;
+    }
+
     #stream-main-td {
         height: 600px;
         width: 64.123456%;
@@ -118,6 +140,7 @@
 
     #td-stream-list {
         width: 35.21234%;
+        vertical-align: top;
     }
 
     #td-stream-chat {
@@ -182,7 +205,7 @@
         font-weight: bold;
         display: inline-block;
         width: 100%;
-        white-space: nowrap;
+        /*white-space: nowrap;*/
         overflow: hidden;
         max-width: 100%;
         text-overflow: ellipsis;
@@ -287,6 +310,12 @@
         line-height: 1;
         text-transform: uppercase;
         color: #767676;
+        margin: 0px;
+        padding: 0px;
+        margin-top: 10px;
+        margin-bottom: -10px;
+    }
+
     }
 
     #stream-h3 > strong {
@@ -360,12 +389,24 @@
         }
         document.getElementById('btn-ok').onclick = function () {
             var stream_name = document.getElementById('stream-name');
-            var str = stream_name.value;
-            if (str != '') {
+            var stream_name_val = stream_name.value;
+            if (stream_name_val != '') {
                 var add_stream_tr = document.getElementById('add_stream-tr');
                 add_stream_tr.style.display = 'none';
+
+                var r = document.getElementsByName("r")[0].value;
+                var recaptcha = document.getElementsByName("g-recaptcha-response")[0].value;
+
+                //alert(r + '\r\n' + recaptcha)
+
+
+                var add_stream_td_form = document.getElementById('add_stream-td_form');
+                //add_stream_td_form.submit();
+
+                var param = 'r=site/addstream' + '&streamname=' + stream_name_val + '&g-recaptcha-response=' + recaptcha;
+                SendData(param, '/index.php?r=site/addstream');
+
                 stream_name.value = '';
-                alert(str);
             }
         }
         document.getElementById('btn-list').onclick = function () {
@@ -411,5 +452,43 @@
         document.getElementById('stream-title').innerHTML = elem.getElementsByClassName('td-stream-list-li-title')[0].innerHTML;
         document.getElementById('stream-author').innerHTML = str;
         document.getElementById('stream-game').innerHTML = elem.getElementsByClassName('td-stream-list-li-game')[0].innerHTML;
+    }
+    function SendData(data, url) {
+        sender = GetXmlHttpRequest();
+        sender.onreadystatechange = GetRequest;
+        sender.open("POST", url);
+        sender.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        sender.send(data);
+    }
+    function GetRequest() {
+        if (sender.readyState == 4) {
+            if (sender.status == 200) {
+                str = sender.responseText;
+                if (str.length > 0) {
+                    //Обрабатываем ответ
+                    //alert(str);
+                }
+            }
+        }
+    }
+    function GetXmlHttpRequest() {
+        var XMLHttp;
+        try {
+            XMLHttp = new XMLHttpRequest();
+        }
+        catch (e) {
+            try {
+                XMLHttp = new ActiveXObject("Msxml2.XMLHTTP");
+            }
+            catch (e) {
+                try {
+                    XMLHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                catch (e) {
+                    return false;
+                }
+            }
+        }
+        return XMLHttp;
     }
 </script>
