@@ -2,13 +2,22 @@
 
 class SiteController extends Controller
 {
-    public $allowed = ['index', 'checkstream', 'addstream'];
+    public $allowed = ['index', 'checkstream', 'addstream', 'getstreams'];
 
     public function index()
     {
         $chanels = new Chanels();
         $data = $chanels->selectAll();
         $this->render('index', ['data' => $data]);
+    }
+
+    public function getstreams()
+    {
+        header('Content-Type: application/json');
+        $chanels = new Chanels();
+        $data = $chanels->selectAll();
+        $str = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        echo $str;
     }
 
     public function addstream()

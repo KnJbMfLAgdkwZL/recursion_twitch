@@ -58,32 +58,34 @@
             </iframe>
         </td>
         <td colspan='2' id='td-stream-list'>
-            <h3 id='td-stream-list-title'>Текушие</h3>
-            <ul class='td-stream-list-ul'>
-                <?php
-                foreach ($data as $k => $v) {
-                    $logo = $v['logo'];
-                    if (empty($logo))
-                        $logo = 'https://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_70x70.png';
 
-                    $title = $v['streamTitle'];
-                    if (empty($title))
-                        $title = $v['name'];
+            <div class="user_list_wraper">
+                <h3 id='td-stream-list-title'>Текушие</h3>
+                <ul class='td-stream-list-ul'>
+                    <?php
+                    foreach ($data as $k => $v) {
+                        $logo = $v['logo'];
+                        if (empty($logo))
+                            $logo = 'https://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_70x70.png';
 
-                    $currentGame = $v['currentGame'];
+                        $title = $v['streamTitle'];
+                        if (empty($title))
+                            $title = $v['name'];
 
-                    $status_class = '';
-                    $status = $v['status'];
-                    if ($status == 'Offline')
-                        $status_class = ' li-status-ofline';
+                        $currentGame = $v['currentGame'];
 
-                    $list_class = '';
-                    if ($k == 0)
-                        $list_class = ' td-stream-list-li-current';
+                        $status_class = '';
+                        $status = $v['status'];
+                        if ($status == 'Offline')
+                            $status_class = ' li-status-ofline';
 
-                    $name = $v['name'];
+                        $list_class = '';
+                        if ($k == 0)
+                            $list_class = ' td-stream-list-li-current';
 
-                    echo "
+                        $name = $v['name'];
+
+                        echo "
                         <li class='td-stream-list-li{$list_class}' onclick='list_click(\"{$name}\", this)'>
                             <span class='td-stream-list-li-avatar'>
                                 <img class='td-stream-list-li-avatar-img' src='{$logo}'/>
@@ -96,9 +98,11 @@
                             </span>
                             <span class='td-stream-list-li-status{$status_class}'>{$status}</span>
                         </li>";
-                }
-                ?>
-            </ul>
+                    }
+                    ?>
+                </ul>
+            </div>
+
         </td>
         <td colspan='2' style='display: none' id='td-stream-chat'>
 
@@ -136,6 +140,11 @@
     #stream-main-td {
         height: 600px;
         width: 64.123456%;
+    }
+
+    .user_list_wraper {
+        overflow: auto;
+        height: 600px;
     }
 
     #td-stream-list {
@@ -378,14 +387,17 @@
             var display = add_stream_tr.style.display;
             if (display == 'none') {
                 add_stream_tr.style.display = 'table-row';
+                grecaptcha.reset();
             }
             else {
                 add_stream_tr.style.display = 'none';
+                grecaptcha.reset();
             }
         }
         document.getElementById('btn-cansel').onclick = function () {
             var add_stream_tr = document.getElementById('add_stream-tr');
             add_stream_tr.style.display = 'none';
+            grecaptcha.reset();
         }
         document.getElementById('btn-ok').onclick = function () {
             var stream_name = document.getElementById('stream-name');
@@ -407,6 +419,7 @@
                 SendData(param, '/index.php?r=site/addstream');
 
                 stream_name.value = '';
+                grecaptcha.reset();
             }
         }
         document.getElementById('btn-list').onclick = function () {
@@ -453,6 +466,7 @@
         document.getElementById('stream-author').innerHTML = str;
         document.getElementById('stream-game').innerHTML = elem.getElementsByClassName('td-stream-list-li-game')[0].innerHTML;
     }
+
     function SendData(data, url) {
         sender = GetXmlHttpRequest();
         sender.onreadystatechange = GetRequest;
@@ -491,4 +505,64 @@
         }
         return XMLHttp;
     }
+
+    function GetData(url) {
+        sender = GetXmlHttpRequest();
+        sender.onreadystatechange = GetStreamList;
+        sender.open("GET", url);
+        sender.send(null);
+    }
+    function GetStreamList() {
+        if (sender.readyState == 4) {
+            if (sender.status == 200) {
+                var str = sender.responseText;
+                var data = JSON.parse(str);
+
+                var current = document.getElementById('stream-author').innerHTML;
+                var str = '';
+                for (var i = 0; i < data.length; i++) {
+                    var v = data[i]
+                    var logo = v['logo'];
+                    if (logo.length <= 0)
+                        logo = 'https://static-cdn.jtvnw.net/jtv_user_pictures/xarth/404_user_70x70.png';
+
+                    var title = v['streamTitle'];
+                    if (title.length <= 0)
+                        title = v['name'];
+
+                    var currentGame = v['currentGame'];
+
+                    var status_class = '';
+                    var status = v['status'];
+                    if (status == 'Offline')
+                        status_class = ' li-status-ofline';
+
+                    var name = v['name'];
+                    var list_class = '';
+                    if (current == name)
+                        list_class = ' td-stream-list-li-current';
+
+                    str += "<li class='td-stream-list-li" + list_class + "' onclick='list_click(\"" + name + "\", this)'>";
+                    str += "<span class='td-stream-list-li-avatar'>";
+                    str += "<img class='td-stream-list-li-avatar-img' src='" + logo + "'/>";
+                    str += "</span>";
+                    str += "<span class='td-stream-list-li-title'>";
+                    str += title;
+                    str += "</span>";
+                    str += "<span class='td-stream-list-li-game'>";
+                    str += currentGame;
+                    str += "</span>";
+                    str += "<span class='td-stream-list-li-status" + status_class + "'>" + status + "</span>";
+                    str += "</li>";
+                }
+                document.getElementsByClassName('td-stream-list-ul')[0].innerHTML = str;
+            }
+        }
+    }
+    function StreamTimerRefresher() {
+        GetData('/index.php?r=site/getstreams');
+    }
+    
+    setInterval(StreamTimerRefresher, 60000);
+
 </script>
