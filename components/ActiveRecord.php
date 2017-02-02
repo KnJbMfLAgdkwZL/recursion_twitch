@@ -2,9 +2,9 @@
 class ActiveRecord
 {
 	protected $host = 'localhost';
-	protected $db_name = '_mymaintest';
+	protected $db_name = 'recursion_twitch';
 	protected $username = 'root';
-	protected $password = '';
+	protected $password = 'recursion2017';
 	protected static $DBH;
 	function Connect()
 	{

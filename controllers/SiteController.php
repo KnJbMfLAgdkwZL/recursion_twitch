@@ -60,21 +60,34 @@ class SiteController extends Controller
 
     public function checkstream()
     {
-        if ($_GET['key'] == 'gNPXJQoouNn7RPEnutyoi64y0066JbrYCXcH1e3kGzKRX7muokIuGgBRORPJ') {
-            $chanels = new Chanels();
-            $data = $chanels->selectAll();
+        if ($_GET['key'] == 'gNPXJQ') {
 
-            $api_data = [];
-            foreach ($data as $v) {
-                $api_data[] = $this->get_api($v['name']);
-            }
+            $mdata = new Settings();
+            $data = $mdata->getData('last_update');
+            $last_update = $data[0]['val'];
+            $last_update = intval($last_update);
+            $last_update = $last_update + 60;
+            $cur_time = intval(time());
 
-            foreach ($api_data as $v) {
-                if ($v['status'] == 'Offline') {
-                    $chanels->updateStatus($v['name'], $v['status']);
-                } else if ($v['status'] == 'Live') {
-                    $chanels->update($v['name'], $v['currentGame'], $v['logo'], $v['streamTitle'], $v['status']);
+            if ($last_update <= $cur_time) {
+                $mdata->setData('last_update', $cur_time);
+
+                $chanels = new Chanels();
+                $data = $chanels->selectAll();
+
+                $api_data = [];
+                foreach ($data as $v) {
+                    $api_data[] = $this->get_api($v['name']);
                 }
+
+                foreach ($api_data as $v) {
+                    if ($v['status'] == 'Offline') {
+                        $chanels->updateStatus($v['name'], $v['status']);
+                    } else if ($v['status'] == 'Live') {
+                        $chanels->update($v['name'], $v['currentGame'], $v['logo'], $v['streamTitle'], $v['status']);
+                    }
+                }
+
             }
         }
     }

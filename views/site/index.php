@@ -2,8 +2,8 @@
     <tr id='add_stream-tr' style='display: none;'>
         <td colspan='3' id='add_stream-td'>
 
-            <form method="post" action="/index.php?r=site/addstream" id="add_stream-td_form">
-                <input type="hidden" name="r" id='r' value="/index.php?r=site/addstream"/>
+            <form method="post" action="./index.php.php?r=site/addstream" id="add_stream-td_form">
+                <input type="hidden" name="r" id='r' value="./index.php.php?r=site/addstream"/>
 
                 <input type='text' name='streamname' id='stream-name' required/>
 
@@ -128,6 +128,11 @@
         unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
     }
 
+    * {
+        padding: 0px;
+        margin: 0px;
+    }
+
     .captcha-wraper {
         text-align: center;
         padding-top: 10px;
@@ -144,6 +149,7 @@
 
     .user_list_wraper {
         overflow: auto;
+        /*height: 600px;*/
         height: 600px;
     }
 
@@ -322,9 +328,8 @@
         margin: 0px;
         padding: 0px;
         margin-top: 10px;
-        margin-bottom: -10px;
-    }
-
+        /*margin-bottom: -10px;*/
+        display: none;
     }
 
     #stream-h3 > strong {
@@ -373,7 +378,7 @@
         vertical-align: -0.23em;
         background-repeat: no-repeat;
         background-position: 0 0;
-        background-image: url('/www/img/index.png');
+        background-image: url('./www/img/index.png');
     }
 
     .icon-chat {
@@ -416,7 +421,7 @@
                 //add_stream_td_form.submit();
 
                 var param = 'r=site/addstream' + '&streamname=' + stream_name_val + '&g-recaptcha-response=' + recaptcha;
-                SendData(param, '/index.php?r=site/addstream');
+                SendData(param, './index.php?r=site/addstream');
 
                 stream_name.value = '';
                 grecaptcha.reset();
@@ -559,10 +564,19 @@
             }
         }
     }
-    function StreamTimerRefresher() {
-        GetData('/index.php?r=site/getstreams');
+
+    function SetData2(url) {
+        sender = GetXmlHttpRequest();
+        sender.onreadystatechange = GetRequest;
+        sender.open("GET", url);
+        sender.send(null);
     }
-    
+
+    function StreamTimerRefresher() {
+        SetData2('./index.php?r=site/checkstream&key=gNPXJQ');
+        GetData('./index.php?r=site/getstreams');
+    }
+
     setInterval(StreamTimerRefresher, 60000);
 
 </script>
